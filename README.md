@@ -37,6 +37,16 @@ You should be ready to go, just hit [](http://localhost:8080) and get coding!
 
 ## Instructions
 
+Open the `app.js` file in your favourite editor.
+
+Tips:
+
+1. The code is written in ES6, if anything is unclear check the docs
+   or ask questions!
+2. Constants or functions whose name ends in `$` (e.g. `tweets$`)
+   denote observable streams, as a convention.
+
+
 ### 1. Live feed
 
 Let's start by displaying a live stream of tweets in the Timeline.
