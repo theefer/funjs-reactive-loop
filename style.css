@@ -1,0 +1,82 @@
+body {
+    color: #ddd;
+    background-color: #333;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #999;
+    margin-right: 20px;
+    outline: none;
+    color: inherit;
+    font-size: inherit;
+}
+
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+
+em {
+    font-style: normal;
+    color: #8BD;
+    border-bottom: 1px dotted #8BD;
+}
+
+ul, ol, li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tweets-column {
+    width: 360px;
+    float: left;
+}
+
+.tweets-column + .tweets-column {
+    margin-left: 30px;
+}
+
+.tweet {
+    padding: 5px;
+    margin: 5px 0;
+    border-bottom: 1px solid #444;
+}
+/* meh, clearfix */
+.tweet:before, .tweet:after {
+    content: " ";
+    display: table;
+}
+.tweet:after {
+    clear: both;
+}
+
+
+.tweet__avatar {
+    float: left;
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.tweet__content {
+    float: left;
+    width: calc(100% - 58px);
+}
+
+.tweet__author {
+    font-weight: bold;
+}
+.tweet__handle {
+    color: #777;
+    margin-left: 10px;
+}

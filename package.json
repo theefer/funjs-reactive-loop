@@ -1,0 +1,33 @@
+{
+  "name": "funjs-reactive-loop-dojo",
+  "version": "1.0.0",
+  "description": "Dojo for the FunctionalJS Reactive Loop talk",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "jspm install",
+    "start": "http-server",
+    "watch": "livereload"
+  },
+  "author": "Sébastien Cevey <seb@cine7.net>",
+  "license": "GPL",
+  "devDependencies": {
+    "http-server": "^0.8.0",
+    "jspm": "~0.15.6",
+    "livereload": "^0.3.7"
+  },
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "json": "github:systemjs/plugin-json@^0.1.0",
+      "reqwest": "github:ded/reqwest@^1.1.5",
+      "rx": "npm:rx@~2.5.2",
+      "vdom-virtualize": "npm:vdom-virtualize@^0.0.7",
+      "virtual-dom": "npm:virtual-dom@~2.0.1"
+    },
+    "devDependencies": {
+      "traceur": "github:jmcriffey/bower-traceur@0.0.88",
+      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.88"
+    }
+  }
+}
