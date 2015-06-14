@@ -48,12 +48,12 @@ to the `columnsComponent`, which itself passes it to the
 `columnComponent`.
 
 First, replace the dummy definition of `tweetList$` with one that
-renders the `tweets$` (see TODO [#1a]). This should make tweets appear
-under your Timeline.
+renders the `tweets$` (see `TODO [#1a]`). This should make tweets
+appear under your Timeline.
 
 Then, refactor the `tweetElement` function to use the more complete
-markup (see TODO [#2b]). This should make tweets look nicer as in the
-screenshot above.
+markup (see `TODO [#2b]`). This should make tweets look nicer as in
+the screenshot above.
 
 
 ### 2. Feed filters
@@ -69,8 +69,8 @@ The components export their respective models as streams (`query$` and
 function under constants of the same name.
 
 Change the dummy definition of `filteredTweets$` in the main `view`
-function to apply the `query$` and `exclReplies$` filters (see TODO
-[#2]). Once done, you should see the Timeline change when using the
+function to apply the `query$` and `exclReplies$` filters (see `TODO
+[#2]`). Once done, you should see the Timeline change when using the
 filters.
 
 
@@ -82,17 +82,17 @@ added first.
 
 First, in the `columnComponent`, let's update the `view$` function to
 push the tweet object of any tweet element clicked onto the
-`activate$` stream (see TODO [#3a]).  This is exposed as the
+`activate$` stream (see `TODO [#3a]`).  This is exposed as the
 `activate$` extent, which for the timeline is translated to the `pin$`
 intent on the `columnsComponent`.
 
-Define `pinnedTweets$` in terms of the `pin$` intent (see TODO
-[#3b]). Once completed, clicking a tweet in the Timeline column should
-make it appear in the Pinned column.
+Define `pinnedTweets$` in terms of the `pin$` intent (see `TODO
+[#3b]`). Once completed, clicking a tweet in the Timeline column
+should make it appear in the Pinned column.
 
 Then, update the `pinnedTweets$` definition to also include the
-`unpin$` intent (see TODO [#3c]). Once completed, clicking a tweet in
-the Pinned columns will make it disappear.
+`unpin$` intent (see `TODO [#3c]`). Once completed, clicking a tweet
+in the Pinned columns will make it disappear.
 
 
 ### 4. Entities highlighting
@@ -103,9 +103,9 @@ the entity extraction.
 
 The `analyseEntities$` takes a string and returns a list of entities
 asynchronously, as a stream. Call this function on each tweet before
-rendering it (see TODO [#4a]). Then pass the returned entities as
+rendering it (see `TODO [#4a]`). Then pass the returned entities as
 second parameter to the `tweetElement` function and use them to
-highlight the words in the tweet (see TODO [#4b]).
+highlight the words in the tweet (see `TODO [#4b]`).
 
 
 ### 5. Drag to pin
