@@ -44,78 +44,32 @@ function filtersComponent() {
 
 
 function tweetElement(tweet, entities) {
-  /* TODO [#1b]: Rewrite to use richer virtual-dom representation
-   *
-   * For best results using the pre-existing CSS,
-   * use the following markup:
-   *
-   * <article class="tweet tweet-123id">
-   *    <img class="tweet__avatar" src="...">
-   *    <div class="tweet__content">
-   *       <div>
-   *           <span class="tweet_author">The Guardian</span>
-   *           <span class="tweet_handle">@guardian</span>
-   *       </div>
-   *       All your <em>quinoa</em> are belong to us.
-   *    </div>
-   * </article>
-   *
-   * See hyperscript documentation:
-   * https://github.com/Matt-Esch/virtual-dom/blob/master/virtual-hyperscript/README.md
-   */
   return h(`article.tweet.tweet-${tweet.id}`, [
+    h('img.tweet__avatar', {src: tweet.user.profile_image_url}),
     h('div.tweet__content', [
-      tweet.text
+      h('div', [
+        h('span.tweet__author', tweet.user.name),
+        h('span.tweet__handle', `@${tweet.user.screen_name}`)
+      ]),
+      highlightEntitiesInText(tweet.text, entities)
     ])
   ]);
-
-  /* TODO [#4b]: Pass in the entities returned by analyseEntities$ to
-   *             this function and use them to highlight words in the
-   *             tweet text.
-   *             The highlightEntitiesInText(text, entities) function
-   *             returns a virtual-dom fragment that highlights the
-   *             given entities in the text.
-   */
 }
 
 function columnComponent(heading) {
   const activate$ = new Rx.Subject;
-  /* TODO [#3a]: Push a tweet object onto the activate$ stream
-   *             (`activate$.onNext(tweet)`) every time a tweet
-   *             element is clicked (use the `onclick` attribute).
-   */
 
   function view$(tweets$) {
-    /* TODO [#1a]: Define tweetList$ that maps the tweets$ stream to a
-     *             virtual-dom rendering of a list of tweets.
-     *
-     * Hint: you will likely want to use `tweetElement` to render each
-     * tweet...
-     */
-    // const tweetList$ = tweets$.map(tweets => {
-    //   return h('div', ??? );
-    // });
-    const tweetList$ = $Obs.return(h('div', 'Tweets to appear here…'));
-
-    /* TODO [#4a]: For each tweet, extract the entities in the
-     *             tweet.text using analyseEntities$, which returns a
-     *             stream of one element - the array of entities found
-     *             in that string.
-     *
-     *             Bonus: don't wait until the entities have been
-     *             extracted to render the element; we can simply
-     *             assume there are no entities initially (see
-     *             the startWith operator).
-     *
-     * Hint: remember that if your mapping function returns a stream,
-     *       you will need to use flatMap instead of map.
-     *
-     * Hint: you can use the container$ helper to wrap a list of
-     *       streams of virtual-dom into a parent element, e.g.:
-     *
-     *   container$('div', [tree1$, tree$2])
-     *   // returns a stream combining tree1$ and tree2$ in a <div>
-     */
+    const tweetList$ = tweets$.flatMap(tweets => {
+      return container$('ol', tweets.map(tweet => {
+        return analyseEntities$(tweet.text).
+          startWith([]).
+          map(entities => tweetElement(tweet, entities)).
+          map(tweetTree => h('li', {
+            onclick: ev => activate$.onNext(tweet)
+          }, tweetTree));
+      }));
+    });
 
     const tree$ = tweetList$.map(tweetList => {
       return h('section.tweets-column', [
@@ -156,6 +110,10 @@ function columnsComponent() {
 }
 
 
+function isReply(tweet) {
+  return tweet.text[0] !== '@';
+}
+
 function view() {
   const filters = filtersComponent();
 
@@ -163,44 +121,32 @@ function view() {
   const exclReplies$ = filters.model.exclReplies$;
 
   const tweets$ = getTweetStream$();
-
-  /* TODO [#2]: Update the definition of filteredTweets$ to combine
-   *            tweets$ with the two filters above:
-   *            - query$: each tweet.text should match the query string
-   *            - exclReplies$: if true, exclude tweets starting with an '@'
-   *
-   * Hint: you may want to use the combineLatest operator:
-   * https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/combinelatest.md
-   */
-  const filteredTweets$ = tweets$;
+  const filteredTweets$ = $Obs.combineLatest(
+    tweets$,
+    query$,
+    exclReplies$,
+    (tweets, query, exclReplies) => {
+      return tweets.
+        filter(tweet => tweet.text.match(new RegExp(query, 'i'))).
+        filter(tweet => exclReplies ? isReply(tweet) : true);
+    });
 
   const columns = columnsComponent();
 
-  /* TODO [#3b]: Implement pinnedTweets$ using the
-   *             `columns.intents.pin$` stream, which is a stream of
-   *             tweet objects clicked for pinning.
-   *             We want pinnedTweets$ to be a stream, each item of
-   *             which is an array of pinned tweets (most recently
-   *             pinned first).
-   *             For bonus points, don't allow the same tweet to be
-   *             pinned twice.
-   *
-   * Hint: Use the scan operator, starting from an empty array (no
-   * tweet pinned initially):
-   * https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/scan.md
-   */
-  const pinnedTweets$ = $Obs.return([]);
+  const pinActions$ = $Obs.merge(
+    columns.intents.pin$.map(tweet => tweets => {
+      if (tweets.find(tw => tw.id === tweet.id)) {
+        return tweets;
+      } else {
+        return [].concat(tweet, tweets);
+      }
+    }),
+    columns.intents.unpin$.map(tweet => tweets => tweets.filter(tw => tw.id !== tweet.id))
+  );
 
-  /* TODO [#3c]: Update pinnedTweets$ to also use the
-   *             `columns.intents.unpin$` stream, which is a stream of
-   *             tweet objects clicked for unpinning.
-   *
-   * Hint: It may help to think of pin$ and unpin$ as stream of
-   * functions applied onto the current state (i.e. the array of
-   * pinned tweets).
-   * You may also find the merge operator useful:
-   * https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/merge.md
-   */
+  const pinnedTweets$ = pinActions$.
+    scan([], (pinnedTweets, stepFn) => stepFn(pinnedTweets)).
+    startWith([]);
 
   const tree$ = container$('div', [
     filters.view$(),
